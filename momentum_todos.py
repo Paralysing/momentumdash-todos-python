@@ -3,10 +3,10 @@ import requests
 import uuid
 
 class MomentumTodos:
-    def __init__(self, bearer_token, todo_list_id='1-inbox'):
+    def __init__(self, bearer_token, client_uuid=str(uuid.uuid1()), client_user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36' todo_list_id='1-inbox'):
         self.bearer_token = bearer_token
         self.todo_list_id = todo_list_id
-        self.client_uuid = str(uuid.uuid1())
+        self.client_uuid = client_uuid
         self.client_headers = {
             'accept': '*/*',
             'accept-encoding': 'gzip, deflate, br',
@@ -16,7 +16,7 @@ class MomentumTodos:
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'cross-site',
             'origin': 'chrome-extension://laookkfknpbbblfpciffpaejjkokdgca',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+            'user-agent': client_user_agent,
             'x-momentum-clientdate': 0,
             'x-momentum-clientid': self.client_uuid,
             'x-momentum-version': '1.11.8'
