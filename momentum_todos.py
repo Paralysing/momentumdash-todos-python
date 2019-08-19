@@ -1,7 +1,5 @@
 from datetime import datetime
 import requests
-import time
-import os
 import uuid
 
 class MomentumTodos:
