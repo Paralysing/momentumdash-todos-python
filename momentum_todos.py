@@ -22,6 +22,16 @@ class MomentumTodos:
             'x-momentum-version': '1.11.8'
         }
 
+    def momentum_api_req(self, method, url, json={}):
+        self.client_headers['x-momentum-clientdate'] = self.get_datetime(for_headers=True)
+        r = None
+        if method == 'get':
+            r = requests.get(url=url, headers=self.client_headers, timeout=10)
+        elif method == 'post':
+            r = requests.post(url=url, headers=self.client_headers, json=json, timeout=10)
+        elif method == 'patch':
+            r = requests.patch(url=url, headers=self.client_headers, json=json, timeout=10)
+        return r
     def set_todo_list_id(self, todo_list_id):
         self.todo_list_id = todo_list_id
 
@@ -31,35 +41,17 @@ class MomentumTodos:
         return str(datetime.utcnow()).replace(' ', 'T')[:-3] + 'Z'
 
     def get_todo_lists(self):
-        self.client_headers['x-momentum-clientdate'] = self.get_datetime(for_headers=True)
-        r = requests.get(
-            url = 'https://api.momentumdash.com/todos/lists?provider_id=1&project_id=1',
-            headers = self.client_headers,
-            json = {
-                'provider_id': '1',
-                'project_id': '1'
-            },
-            timeout = 10
-        )
+        r = self.momentum_api_req(method='get', url='https://api.momentumdash.com/todos/lists?provider_id=1&project_id=1')
         return r.json()
 
     def get_todo_list_items(self):
-        self.client_headers['x-momentum-clientdate'] = self.get_datetime(for_headers=True)
-        r = requests.get(
-            url = 'https://api.momentumdash.com/todos?listId=' + self.todo_list_id,
-            headers = self.client_headers,
-            json = {
-                'listId': self.todo_list_id,
-            },
-            timeout = 10
-        )
+        r = self.momentum_api_req(method='get', url='https://api.momentumdash.com/todos?listId=' + self.todo_list_id)
         return r.json()
 
     def add_item_to_todo_list(self, title):
-        self.client_headers['x-momentum-clientdate'] = self.get_datetime(for_headers=True)
-        r = requests.post(
-            url = 'https://api.momentumdash.com/todos',
-            headers = self.client_headers,
+        r = self.momentum_api_req(
+            method = 'post', 
+            url = 'https://api.momentumdash.com/todos', 
             json = {
                 'archive': False,
                 'archivedDate': None,
@@ -73,35 +65,30 @@ class MomentumTodos:
                 'serverSetId': False,
                 'title': title,
                 'unsyncable': False
-            },
-            timeout = 10
+            }
         )
         return r.json()['id']
 
     def finish_item_in_todo_list(self, item_id):
-        self.client_headers['x-momentum-clientdate'] = self.get_datetime(for_headers=True)
-        r = requests.patch(
-            url = 'https://api.momentumdash.com/todos/' + item_id,
-            headers = self.client_headers,
+        r = self.momentum_api_req(
+            method = 'patch', 
+            url = 'https://api.momentumdash.com/todos/' + item_id, 
             json = {
                 'completedDate': self.get_datetime(for_headers=False),
                 'done': True,
                 'projectId': '1',
                 'providerId': '1'
-            },
-            timeout = 10
+            }
         )
 
     def delete_item_in_todo_list(self, item_id):
-        self.client_headers['x-momentum-clientdate'] = self.get_datetime(for_headers=True)
-        r = requests.patch(
-            url = 'https://api.momentumdash.com/todos/' + item_id,
-            headers = self.client_headers,
+        r = self.momentum_api_req(
+            method = 'patch', 
+            url = 'https://api.momentumdash.com/todos/' + item_id, 
             json = {
                 'deletedDate': self.get_datetime(for_headers=False),
                 'deleted': True,
                 'projectId': '1',
                 'providerId': '1'
-            },
-            timeout = 10
+            }
         )
